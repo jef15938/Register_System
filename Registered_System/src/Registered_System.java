@@ -1,5 +1,13 @@
+import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 
 public class Registered_System 
 {
@@ -7,6 +15,7 @@ public class Registered_System
 	{
 		// TODO Auto-generated method stub
 		
+		Login_window Window=new Login_window();
 		Member_Data MD=new Member_Data();
 		MD.Register("jef15938", "88");
 		MD.Register("jef15938", "33");
@@ -22,6 +31,53 @@ public class Registered_System
 	}
 
 }
+
+class Login_window
+{
+	JFrame mainframe=new JFrame("µn¤Jµ¡¤f");
+	JPanel toppanel=new JPanel();
+	JPanel midpanel=new JPanel();
+	JPanel downpanel=new JPanel();
+	JLabel aclabel=new JLabel("                                ±b¸¹");
+	JLabel pwdlabel=new JLabel("                                ±K½X");
+	JTextField actextfield=new JTextField();
+	JTextField pwdtextfield=new JTextField();
+	JButton loginbutton =new JButton("Login");
+	JButton forgetbutton =new JButton("Forget account");
+	JButton registerbutton =new JButton("Register");
+	
+	
+	
+	Login_window()
+	{
+		mainframe.setLayout(new GridLayout(3,1));
+		
+		toppanel.setLayout(new GridLayout(1,2));
+		toppanel.add(aclabel);
+		toppanel.add(actextfield);
+		mainframe.add(toppanel);
+		
+		midpanel.setLayout(new GridLayout(1,2));
+		midpanel.add(pwdlabel);
+		midpanel.add(pwdtextfield);
+		mainframe.add(midpanel);
+		
+		downpanel.setLayout(new GridLayout(1,3));
+		downpanel.add(registerbutton);
+		downpanel.add(forgetbutton);
+		downpanel.add(loginbutton);
+		mainframe.add(downpanel);
+		
+		mainframe.setPreferredSize(new Dimension(500,300));
+		mainframe.pack();
+		mainframe.setVisible(true);
+		mainframe.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		
+	}
+	
+}
+
+
 
 class Member_Data
 {
