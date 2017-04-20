@@ -1,5 +1,10 @@
+package register_system;
+
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -9,7 +14,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-public class Registered_System 
+
+public class register_system 
 {
 	public static void main(String[] args) 
 	{
@@ -25,26 +31,40 @@ public class Registered_System
 		
 		MD.Browse();
 		
-		MD.Search("jef15938");
+		MD.Search("*jef15938");
 		
 
 	}
 
 }
 
-class Login_window
+
+class Login_window implements ActionListener
 {
 	JFrame mainframe=new JFrame("登入窗口");
 	JPanel toppanel=new JPanel();
 	JPanel midpanel=new JPanel();
 	JPanel downpanel=new JPanel();
-	JLabel aclabel=new JLabel("                                帳號");
+	JLabel actlabel=new JLabel("                                帳號");
 	JLabel pwdlabel=new JLabel("                                密碼");
 	JTextField actextfield=new JTextField();
 	JTextField pwdtextfield=new JTextField();
 	JButton loginbutton =new JButton("Login");
 	JButton forgetbutton =new JButton("Forget account");
 	JButton registerbutton =new JButton("Register");
+	
+	JPanel rtoppanel=new JPanel();
+	JPanel rmidpanel=new JPanel();
+	JPanel rdownpanel=new JPanel();
+	JLabel ractlabel=new JLabel("                                帳號");
+	JLabel rpwdlabel=new JLabel("                                密碼");
+	JLabel remaillabel=new JLabel("                               電子信箱");
+	JTextField ractextfield=new JTextField();
+	JTextField rpwdtextfield=new JTextField();
+	JTextField remailtextfield=new JTextField();
+	JLabel rmsglabel=new JLabel("");
+	JButton renterbutton =new JButton("OK");
+	
 	
 	
 	
@@ -53,7 +73,7 @@ class Login_window
 		mainframe.setLayout(new GridLayout(3,1));
 		
 		toppanel.setLayout(new GridLayout(1,2));
-		toppanel.add(aclabel);
+		toppanel.add(actlabel);
 		toppanel.add(actextfield);
 		mainframe.add(toppanel);
 		
@@ -63,6 +83,7 @@ class Login_window
 		mainframe.add(midpanel);
 		
 		downpanel.setLayout(new GridLayout(1,3));
+		registerbutton.addActionListener(this);
 		downpanel.add(registerbutton);
 		downpanel.add(forgetbutton);
 		downpanel.add(loginbutton);
@@ -73,6 +94,49 @@ class Login_window
 		mainframe.setVisible(true);
 		mainframe.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		
+	}
+
+
+
+	@Override
+	public void actionPerformed(ActionEvent e) 
+	{
+		// TODO Auto-generated method stub
+		if(e.getActionCommand().equals("Register"))
+		{
+			JFrame JF=Register_window();
+		}
+		
+	}
+	
+	public JFrame Register_window()
+	{
+		JFrame JF=new JFrame();
+		JF.setLayout(new GridLayout(5,1));
+		
+		rtoppanel.setLayout(new GridLayout(1,2));
+		rtoppanel.add(ractlabel);
+		rtoppanel.add(ractextfield);
+		JF.add(rtoppanel);
+		
+		rmidpanel.setLayout(new GridLayout(1,2));
+		rmidpanel.add(rpwdlabel);
+		rmidpanel.add(rpwdtextfield);
+		JF.add(rmidpanel);
+		
+		rdownpanel.setLayout(new GridLayout(1,2));
+		rdownpanel.add(remaillabel);
+		rdownpanel.add(remailtextfield);
+		JF.add(rdownpanel);
+		
+		JF.add(rmsglabel);
+		JF.add(renterbutton,BorderLayout.CENTER);
+		
+		JF.setPreferredSize(new Dimension(500,300));
+		JF.pack();
+		JF.setVisible(true);
+		JF.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		return JF;
 	}
 	
 }
@@ -86,26 +150,34 @@ class Member_Data
 	
 	void Register(String account_num,String pwd)
 	{
-		if(AccountIsLegal(account_num,pwd)) 
+		if(AccountIsLegal(account_num,pwd)==1) 
 		{
+			System.out.println(account_num+" "+pwd);
+			System.out.println("This account registers successfully\n");
 			Member_count++;
 			Account.put(account_num,pwd);
 		}
 	
-		else
+		else if(AccountIsLegal(account_num,pwd)==0)
 		{
 			System.out.println(account_num+" "+pwd);
-			System.out.println("This account is not Legal\n");
+			System.out.println("This account is exists\n");
+		}
+		
+		else //AccountIsLegal(account_num,pwd)==-1
+		{
+			System.out.println(account_num+" "+pwd);
+			System.out.println("This account has illegal char\n");
 		}
 	}
 	
 	void Search(String account_num)
 	{
 		if(Account.get(account_num)!=null)
-		{System.out.println(Account.get(account_num));}
+		{System.out.println("Account("+account_num+")search pwd result "+Account.get(account_num));}
 		
 		else
-		{System.out.println("This user is not exists!\n");}
+		{System.out.println("Account("+account_num+")"+" This user is not exists\n");}
 	}
 	
 	void Browse()
@@ -115,25 +187,43 @@ class Member_Data
 		{System.out.println(key + " " + Account.get(key));}
 	}
 	
-	boolean AccountIsLegal(String account_num,String pwd)
+	int AccountIsLegal(String account_num,String pwd) //1:legal; 0:same_act; -1:illegal char;
 	{
-		char Illegal_char[]={'`','~','!','@','#','$','%','^','&','*',',','.','/'};
+		int actright=0;
 		int Legal=1;
 		
-		for(char c:Illegal_char)
+		char[] account_num_chararray=account_num.toCharArray();
+		
+		for(char c:account_num_chararray)
 		{
 			//System.out.println("c:"+c);
-			if(account_num.indexOf(c)>=0||pwd.indexOf(c)>=0)
-			{Legal=0;}
+			if((c>='0'&&c<='9')||(c>='a'&&c<='z')||(c>='A'&&c<='Z'))
+			{actright++;}
 		}
 		
-		for(Object key:Account.keySet())
+		if(actright!=account_num.length())
 		{
-			if(account_num.indexOf((String)key)>=0)
-			{Legal=0;}
+			Legal=0;
+			return -1;
 		}
 		
-		return (Legal==1?true:false);
+		else //actright==account_num.length()
+		{
+			for(Object key:Account.keySet())
+			{
+				if(account_num.indexOf((String)key)>=0)
+				{
+					Legal=0;
+				}
+			}
+			
+			return (Legal==1)?1:0;
+			
+		}
+	
+		
+		
+		
 		
 	}
 	
