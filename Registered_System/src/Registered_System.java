@@ -1,8 +1,10 @@
 package register_system;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.List;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -23,15 +25,16 @@ public class register_system
 		
 		Login_window Window=new Login_window();
 		Member_Data MD=new Member_Data();
-		MD.Register("jef15938", "88");
-		MD.Register("jef15938", "33");
-		MD.Register(".jef15931.", "11");
-		MD.Register("jef15931", "11*");
-		MD.Register("*jef159312", "11");
+		MD.Register("jef15938", "88","jef@");
+		MD.Register("jef15938", "33","qwe");
+		MD.Register(".jef15931.", "11","hi");
+		MD.Register("jef15931", "11*","jef@");
+		MD.Register("*jef159312", "11","qwer");
+		MD.Register("windy0616", "0323","windy@");
 		
 		MD.Browse();
 		
-		MD.Search("*jef15938");
+		MD.Search("windy0616");
 		
 
 	}
@@ -41,6 +44,7 @@ public class register_system
 
 class Login_window implements ActionListener
 {
+	Member_Data MD=new Member_Data();
 	JFrame mainframe=new JFrame("µn¤Jµ¡¤f");
 	JPanel toppanel=new JPanel();
 	JPanel midpanel=new JPanel();
@@ -62,7 +66,7 @@ class Login_window implements ActionListener
 	JTextField ractextfield=new JTextField();
 	JTextField rpwdtextfield=new JTextField();
 	JTextField remailtextfield=new JTextField();
-	JLabel rmsglabel=new JLabel("");
+	JLabel rmsglabel=new JLabel("",JLabel.CENTER);
 	JButton renterbutton =new JButton("OK");
 	
 	
@@ -101,10 +105,24 @@ class Login_window implements ActionListener
 	@Override
 	public void actionPerformed(ActionEvent e) 
 	{
+		JFrame Register_JF = new JFrame();
 		// TODO Auto-generated method stub
 		if(e.getActionCommand().equals("Register"))
 		{
-			JFrame JF=Register_window();
+			Register_JF=Register_window();
+		}
+		
+		if(e.getActionCommand().equals("OK"))
+		{
+			
+				rmsglabel.setText(""+MD.Register(ractextfield.getText(),rpwdtextfield.getText(),remailtextfield.getText()));
+				if(rmsglabel.getText().equals("This account registers successfully"))
+				{((JButton)e.getSource()).setBackground(Color.green);}
+				else
+				{((JButton)e.getSource()).setBackground(null);}
+				
+			
+	
 		}
 		
 	}
@@ -114,7 +132,16 @@ class Login_window implements ActionListener
 		JFrame JF=new JFrame();
 		JF.setLayout(new GridLayout(5,1));
 		
+		ractextfield.setText("");
+		rpwdtextfield.setText("");
+		remailtextfield.setText("");
+		rmsglabel.setText("");
+		renterbutton.setBackground(null);
+		
+		
+		
 		rtoppanel.setLayout(new GridLayout(1,2));
+		
 		rtoppanel.add(ractlabel);
 		rtoppanel.add(ractextfield);
 		JF.add(rtoppanel);
@@ -130,6 +157,7 @@ class Login_window implements ActionListener
 		JF.add(rdownpanel);
 		
 		JF.add(rmsglabel);
+		renterbutton.addActionListener(this);
 		JF.add(renterbutton,BorderLayout.CENTER);
 		
 		JF.setPreferredSize(new Dimension(500,300));
@@ -146,35 +174,41 @@ class Login_window implements ActionListener
 class Member_Data
 {
 	static int Member_count=0;
-	HashMap Account = new HashMap();
-	
-	void Register(String account_num,String pwd)
+	HashMap Account = new HashMap<String,String>();
+	HashMap Account_email = new HashMap<String,String>();
+
+	String Register(String account_num,String pwd,String email)
 	{
-		if(AccountIsLegal(account_num,pwd)==1) 
+		
+		if(AccountIsLegal(account_num,pwd)==-1)
 		{
-			System.out.println(account_num+" "+pwd);
-			System.out.println("This account registers successfully\n");
-			Member_count++;
-			Account.put(account_num,pwd);
-		}
-	
-		else if(AccountIsLegal(account_num,pwd)==0)
-		{
-			System.out.println(account_num+" "+pwd);
-			System.out.println("This account is exists\n");
+			System.out.println(account_num+" "+pwd+" "+email);
+			return("This account has illegal char");
 		}
 		
-		else //AccountIsLegal(account_num,pwd)==-1
+		else if(AccountIsLegal(account_num,pwd)==1) 
 		{
-			System.out.println(account_num+" "+pwd);
-			System.out.println("This account has illegal char\n");
+			System.out.println(account_num+" "+pwd+" "+email);
+			Member_count++;
+			Account.put(account_num,pwd);
+			Account_email.put(account_num,email);
+			return ("This account registers successfully");
 		}
+	
+		else //(AccountIsLegal(account_num,pwd)==0)
+		{
+			System.out.println(account_num+" "+pwd+" "+email);
+			return("This account is exists");
+		}
+		
+		
+		
 	}
 	
 	void Search(String account_num)
 	{
 		if(Account.get(account_num)!=null)
-		{System.out.println("Account("+account_num+")search pwd result "+Account.get(account_num));}
+		{System.out.println("Account("+account_num+")search "+Account.get(account_num)+" "+Account_email.get(account_num));}
 		
 		else
 		{System.out.println("Account("+account_num+")"+" This user is not exists\n");}
@@ -184,7 +218,7 @@ class Member_Data
 	{
 		System.out.println("Member count:"+Member_count);
 		for(Object key:Account.keySet())
-		{System.out.println(key + " " + Account.get(key));}
+		{System.out.println(key + " " + Account.get(key) + " " + Account_email.get(key));}
 	}
 	
 	int AccountIsLegal(String account_num,String pwd) //1:legal; 0:same_act; -1:illegal char;
@@ -194,32 +228,36 @@ class Member_Data
 		
 		char[] account_num_chararray=account_num.toCharArray();
 		
-		for(char c:account_num_chararray)
+		if(account_num.equals("")||pwd.equals("")){return -1;}
+		else
 		{
-			//System.out.println("c:"+c);
-			if((c>='0'&&c<='9')||(c>='a'&&c<='z')||(c>='A'&&c<='Z'))
-			{actright++;}
-		}
-		
-		if(actright!=account_num.length())
-		{
-			Legal=0;
-			return -1;
-		}
-		
-		else //actright==account_num.length()
-		{
-			for(Object key:Account.keySet())
+			for(char c:account_num_chararray)
 			{
-				if(account_num.indexOf((String)key)>=0)
-				{
-					Legal=0;
-				}
+				//System.out.println("c:"+c);
+				if((c>='0'&&c<='9')||(c>='a'&&c<='z')||(c>='A'&&c<='Z'))
+				{actright++;}
 			}
+		
+			if(actright!=account_num.length())
+			{
+				Legal=0;
+				return -1;
+			}
+		
+			else //actright==account_num.length()
+			{
+				for(Object key:Account.keySet())
+				{
+					if(account_num.equals((String)key))
+					{
+						Legal=0;
+					}
+				}
 			
 			return (Legal==1)?1:0;
 			
-		}
+			}
+		}	
 	
 		
 		
