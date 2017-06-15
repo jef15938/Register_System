@@ -30,12 +30,8 @@ import javax.swing.JTextField;
 public class register_system 
 {
 	public static void main(String[] args) 
-	{
-		// TODO Auto-generated method stub
-		
+	{		
 		Login_window Window=new Login_window();
-		
-
 	}
 
 }
@@ -44,10 +40,10 @@ public class register_system
 class Login_window implements ActionListener
 {
 	Member_Data MD=new Member_Data();
-	
 	JFrame mainframe=new JFrame("登入窗口");
 	JPanel toppanel=new JPanel();
 	JPanel midpanel=new JPanel();
+	JLabel msglabel=new JLabel("",JLabel.CENTER);
 	JPanel downpanel=new JPanel();
 	JLabel actlabel=new JLabel("                                帳號");
 	JLabel pwdlabel=new JLabel("                                密碼");
@@ -80,6 +76,8 @@ class Login_window implements ActionListener
 	JLabel fmsglabel=new JLabel("Please enter your account and email,your password will send to your email",JLabel.CENTER);
 	JButton fenterbutton =new JButton("OK");
 	
+	AdminstractorWindow Admin_Window;
+	
 	
 	
 	
@@ -91,7 +89,7 @@ class Login_window implements ActionListener
 		MD.Register(".jef15931.", "11","hi");
 		MD.Register("jef15931", "11*","jef@");
 		MD.Register("*jef159312", "11","qwer");
-		MD.Register("windy0616", "0323","windy@");
+		MD.Register("windy0617", "0323","windy@");
 		
 		MD.Browse();
 		
@@ -102,7 +100,7 @@ class Login_window implements ActionListener
 		
 		
 		
-		mainframe.setLayout(new GridLayout(3,1));
+		mainframe.setLayout(new GridLayout(4,1));
 		
 		toppanel.setLayout(new GridLayout(1,2));
 		toppanel.add(actlabel);
@@ -113,6 +111,8 @@ class Login_window implements ActionListener
 		midpanel.add(pwdlabel);
 		midpanel.add(pwdtextfield);
 		mainframe.add(midpanel);
+		
+		mainframe.add(msglabel);
 		
 		downpanel.setLayout(new GridLayout(1,3));
 		registerbutton.addActionListener(this);
@@ -145,7 +145,7 @@ class Login_window implements ActionListener
 		
 		if(e.getSource()==renterbutton)
 		{
-			
+			    
 				rmsglabel.setText(""+MD.Register(ractextfield.getText(),rpwdtextfield.getText(),remailtextfield.getText()));
 				if(rmsglabel.getText().equals("This account registers successfully"))
 				{renterbutton.setBackground(Color.green);}
@@ -168,7 +168,13 @@ class Login_window implements ActionListener
 		
 		if(e.getSource()==fenterbutton)
 		{
-			if(MD.SendPassword(factextfield.getText(), femailtextfield.getText())==1)
+			fenterbutton.setText("Please wait a few seconds");
+			if(fenterbutton.getBackground()==Color.green)
+			{
+				Forget_Pwd_JF.dispose();
+			}
+			
+			else if(MD.SendPassword(factextfield.getText(), femailtextfield.getText())==1)
 			{
 				fmsglabel.setText("Send password success");
 				fenterbutton.setBackground(Color.green);
@@ -178,6 +184,8 @@ class Login_window implements ActionListener
 				fmsglabel.setText("Send password fail");
 				fenterbutton.setBackground(null);
 			}
+			
+			fenterbutton.setText("OK");
 		}
 		
 		
@@ -187,14 +195,23 @@ class Login_window implements ActionListener
 		
 		if(e.getActionCommand().equals("Login"))
 		{
-			if(MD.Search(actextfield.getText(),pwdtextfield.getText())==1)
+			if(actextfield.getText().equals("ADMIN")&&pwdtextfield.getText().equals("ADMIN"))
 			{
-				System.out.println("Login successfully");
+				Admin_Window=new AdminstractorWindow(this.MD);
+				msglabel.setText("Login successfully");
+			}
+			else if(MD.Search(actextfield.getText(),pwdtextfield.getText())==1)
+			{
+				msglabel.setText("Login successfully");
 				LoginSuccessWindow lsw=new LoginSuccessWindow(actextfield.getText());
 			}
 			else
-			{System.out.println("Login fail");}
+			{msglabel.setText("Login fail");}
 		}
+		
+		
+		
+		
 		
 	}
 	
@@ -204,7 +221,7 @@ class Login_window implements ActionListener
 		JFrame JF=new JFrame();
 
 		
-		
+		fmsglabel.setText("");
 		JF.setLayout(new GridLayout(4,1));
 		
 		fenterbutton.setBackground(null);
@@ -212,11 +229,13 @@ class Login_window implements ActionListener
 	
 		ftoppanel.setLayout(new GridLayout(1,2));
 		ftoppanel.add(factlabel);
+		factextfield.setText("");
 		ftoppanel.add(factextfield);
 		JF.add(ftoppanel);
 		
 		fmidpanel.setLayout(new GridLayout(1,2));
 		fmidpanel.add(femaillabel);
+		femailtextfield.setText("");
 		fmidpanel.add(femailtextfield);
 		JF.add(fmidpanel);
 				
@@ -277,6 +296,9 @@ class Login_window implements ActionListener
 		return JF;
 	}
 	
+	
+	
+	
 }
 
 
@@ -287,6 +309,18 @@ class Member_Data
 	HashMap Account = new HashMap<String,String>();
 	HashMap Account_email = new HashMap<String,String>();
 
+	int GetMember_count()
+	{
+		return this.Member_count;
+	}
+	
+	HashMap GetAccount()
+	{return this.Account;}
+	
+	HashMap GetAccount_email()
+	{return this.Account_email;}
+	
+	
 	String Register(String account_num,String pwd,String email)
 	{
 		
@@ -313,6 +347,16 @@ class Member_Data
 		
 		
 		
+	}
+	
+	void Delete(String account_num)
+	{
+		if(Search(account_num,Account.get(account_num).toString())==1)
+		{
+			Member_count--;
+			Account.remove(account_num);
+			Account_email.remove(account_num);
+		}
 	}
 	
 	int Search(String account_num,String account_pwd)
@@ -463,6 +507,89 @@ class LoginSuccessWindow
 		JF.pack();
 		JF.setVisible(true);
 		JF.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+	}
+}
+
+class AdminstractorWindow implements ActionListener
+{
+	JButton Delete[];
+	JLabel Member_Data[][];
+	Member_Data MD;
+	HashMap Account;
+	HashMap Account_email;
+	int Member_count=-1;
+	JFrame JF;
+	
+	
+	AdminstractorWindow(Member_Data MD)
+	{
+		JF=new JFrame();
+		this.MD=MD;
+		Account=MD.GetAccount();
+		Account_email=MD.GetAccount_email();
+		Member_count=MD.GetMember_count();
+		JF.setPreferredSize(new Dimension(700,100+100*Member_count));
+		JF.setLayout(new GridLayout(MD.GetMember_count()+1,4));
+		Member_Data=new JLabel[MD.GetMember_count()][3];
+		Delete=new JButton[MD.GetMember_count()];
+		JLabel act=new JLabel("帳號",JLabel.CENTER);
+		JLabel pwd=new JLabel("密碼",JLabel.CENTER);
+		JLabel email=new JLabel("電子信箱",JLabel.CENTER);
+		JLabel delete=new JLabel("刪除",JLabel.CENTER);
+		
+		act.setBackground(Color.WHITE);
+		pwd.setBackground(Color.white);
+		email.setBackground(Color.white);
+		delete.setBackground(Color.white);
+		act.setOpaque(true);
+		pwd.setOpaque(true);
+		email.setOpaque(true);
+		delete.setOpaque(true);
+		JF.add(act);
+		JF.add(pwd);
+		JF.add(email);
+		JF.add(delete);
+		
+		int i=0;
+		for(Object key:MD.Account.keySet())
+		{
+			
+			Member_Data[i][0]=new JLabel(key.toString(),JLabel.CENTER);
+			Member_Data[i][1]=new JLabel(MD.Account.get(key).toString(),JLabel.CENTER);
+			Member_Data[i][2]=new JLabel(MD.Account_email.get(key).toString(),JLabel.CENTER);		
+			Delete[i]=new JButton("Delete");
+			Delete[i].addActionListener(this);
+			
+			JF.add(Member_Data[i][0]);
+			JF.add(Member_Data[i][1]);
+			JF.add(Member_Data[i][2]);
+			JF.add(Delete[i]);
+			
+			i++;		
+		}
+		
+		
+		JF.pack();
+		JF.setVisible(true);
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) 
+	{
+		if(e.getActionCommand().equals("Delete"))
+		{
+			System.out.println(MD.GetMember_count()+"位");
+			for(int i=0;i<Member_count;i++)
+			{
+				if(e.getSource()==Delete[i]&&Member_Data[i][0].getText()!="")
+				{
+					MD.Delete(Member_Data[i][0].getText());
+					Member_Data[i][0].setText("");		
+					Member_Data[i][1].setText("");		
+					Member_Data[i][2].setText("");		
+				}
+			}
+		}
 	}
 }
 
