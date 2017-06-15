@@ -7,6 +7,11 @@ import java.awt.GridLayout;
 import java.awt.List;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Properties;
@@ -29,7 +34,7 @@ import javax.swing.JTextField;
 
 public class register_system 
 {
-	public static void main(String[] args) 
+	public static void main(String[] args) throws IOException 
 	{		
 		Login_window Window=new Login_window();
 	}
@@ -81,19 +86,18 @@ class Login_window implements ActionListener
 	
 	
 	
-	Login_window()
+	Login_window() throws IOException
 	{
 		
-		MD.Register("jef15938", "88","jef@");
-		MD.Register("jef15938", "33","qwe");
-		MD.Register(".jef15931.", "11","hi");
-		MD.Register("jef15931", "11*","jef@");
-		MD.Register("*jef159312", "11","qwer");
-		MD.Register("windy0617", "0323","windy@");
+		FileReader fr = new FileReader("MemberData.txt");
+		BufferedReader br = new BufferedReader(fr);
+		String data;
+		while ((data=br.readLine())!=null)
+		{
+		  String s[]=data.split(" ");
+		  MD.Register(s[0], s[1], s[2]);
+		}
 		
-		MD.Browse();
-		
-		MD.Search("windy0616");
 		
 		
 		
@@ -148,7 +152,16 @@ class Login_window implements ActionListener
 			    
 				rmsglabel.setText(""+MD.Register(ractextfield.getText(),rpwdtextfield.getText(),remailtextfield.getText()));
 				if(rmsglabel.getText().equals("This account registers successfully"))
-				{renterbutton.setBackground(Color.green);}
+				{	
+					renterbutton.setBackground(Color.green);
+					try {
+						MD.WriteAllMemberData();
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				
+				}
 				else
 				{renterbutton.setBackground(null);}
 				
@@ -218,9 +231,8 @@ class Login_window implements ActionListener
 	
 	public JFrame Forget_Pwd_Window()
 	{
-		JFrame JF=new JFrame();
+		JFrame JF=new JFrame("Forget Password");
 
-		
 		fmsglabel.setText("");
 		JF.setLayout(new GridLayout(4,1));
 		
@@ -258,7 +270,7 @@ class Login_window implements ActionListener
 	
 	public JFrame Register_Window()
 	{
-		JFrame JF=new JFrame();
+		JFrame JF=new JFrame("Register");
 		JF.setLayout(new GridLayout(5,1));
 		
 		ractextfield.setText("");
@@ -321,7 +333,7 @@ class Member_Data
 	{return this.Account_email;}
 	
 	
-	String Register(String account_num,String pwd,String email)
+	String Register(String account_num,String pwd,String email) 
 	{
 		
 		if(AccountIsLegal(account_num,pwd)==-1)
@@ -336,6 +348,8 @@ class Member_Data
 			Member_count++;
 			Account.put(account_num,pwd);
 			Account_email.put(account_num,email);
+			
+			
 			return ("This account registers successfully");
 		}
 	
@@ -442,11 +456,15 @@ class Member_Data
 	}
 	
 	
-	void Browse()
+	void WriteAllMemberData() throws IOException
 	{
-		System.out.println("Member count:"+Member_count);
+		FileWriter fw;	
+		fw = new FileWriter("MemberData.txt");
 		for(Object key:Account.keySet())
-		{System.out.println(key + " " + Account.get(key) + " " + Account_email.get(key));}
+		{
+			fw.write(key.toString()+" "+Account.get(key).toString()+" "+Account_email.get(key).toString()+"\r\n");
+		}
+		fw.close();
 	}
 	
 	int AccountIsLegal(String account_num,String pwd) //1:legal; 0:same_act; -1:illegal char;
@@ -584,6 +602,12 @@ class AdminstractorWindow implements ActionListener
 				if(e.getSource()==Delete[i]&&Member_Data[i][0].getText()!="")
 				{
 					MD.Delete(Member_Data[i][0].getText());
+					try {
+						MD.WriteAllMemberData();
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}					
 					Member_Data[i][0].setText("");		
 					Member_Data[i][1].setText("");		
 					Member_Data[i][2].setText("");		
