@@ -86,17 +86,27 @@ class Login_window implements ActionListener
 	
 	
 	
-	Login_window() throws IOException
+	Login_window() 
 	{
 		
-		FileReader fr = new FileReader("MemberData.txt");
-		BufferedReader br = new BufferedReader(fr);
-		String data;
-		while ((data=br.readLine())!=null)
-		{
-		  String s[]=data.split(" ");
-		  MD.Register(s[0], s[1], s[2]);
+		FileReader fr;
+		try {
+			fr = new FileReader("MemberData.txt");
+			BufferedReader br = new BufferedReader(fr);
+			String data;
+			while ((data=br.readLine())!=null)
+			{
+			  String s[]=data.split(" ");
+			  MD.Register(s[0], s[1], s[2]);
+			}
+			msglabel.setText("Input MemberData");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			msglabel.setText("There is no input MemberData");
+			
 		}
+	
+		
 		
 		
 		
@@ -336,7 +346,7 @@ class Member_Data
 	String Register(String account_num,String pwd,String email) 
 	{
 		
-		if(AccountIsLegal(account_num,pwd)==-1)
+		if(AccountIsLegal(account_num,pwd)==-1||email.equals(""))
 		{
 			System.out.println(account_num+" "+pwd+" "+email);
 			return("This account has illegal char");
@@ -520,8 +530,8 @@ class LoginSuccessWindow
 	{
 		UserName=s;
 		JFrame JF=new JFrame("SQA System");
-		JF.setPreferredSize(new Dimension(700,500));
-		JF.add(new JLabel("Hello "+UserName+"!"));
+		JF.setPreferredSize(new Dimension(500,300));
+		JF.add(new JLabel("Hello "+UserName+"!"),JLabel.CENTER);
 		JF.pack();
 		JF.setVisible(true);
 		JF.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -541,7 +551,7 @@ class AdminstractorWindow implements ActionListener
 	
 	AdminstractorWindow(Member_Data MD)
 	{
-		JF=new JFrame();
+		JF=new JFrame("Admin mode");
 		this.MD=MD;
 		Account=MD.GetAccount();
 		Account_email=MD.GetAccount_email();
